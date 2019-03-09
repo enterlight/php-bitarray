@@ -3,12 +3,14 @@
 /**
  * chdemko\BitArray\BitArray class
  *
- * @author     Christophe Demko <chdemko@gmail.com>
+ * @author     Christophe Demko <chdemko@gmail.com>  Brigitte Bedard <brigitte.bedard@gmail.com>
+ * @copyright  Copyright (C) 2012-2019 Brigitte Bedard. All rights reserved.
  * @copyright  Copyright (C) 2012-2018 Christophe Demko. All rights reserved.
  *
  * @license    BSD 3-Clause License
  *
- * This file is part of the php-bitarray package https://github.com/chdemko/php-bitarray
+ * This file is part of the php-bitarray package https://github.com/enterlight/php-bitarray that has been forked from
+ * https://github.com/chdemko/php-bitarray
  */
 
 // Declare chdemko\BitArray namespace
@@ -664,95 +666,243 @@ class BitArray implements \ArrayAccess, \Countable, \IteratorAggregate, \JsonSer
 		return $this->restrict();
 	}
 
-	/**
-	 * Or with an another bit array
-	 *
+    /**
+     * Or with an another bit array
+     *
+     * @param   BitArray  $bits  A bit array
+     *
+     * @return  BitArray  This object for chaining
+     *
+     * @throw   \InvalidArgumentException  Argument must be of equal size
+     *
+     * @since   1.0.0
+     */
+    public function applyOr(BitArray $bits)
+    {
+        if ($this->size == $bits->size)
+        {
+            $length = strlen($this->data);
+
+            for ($index = 0; $index < $length; $index++)
+            {
+                $this->data[$index] = chr(ord($this->data[$index]) | ord($bits->data[$index]));
+            }
+
+            return $this;
+        }
+        else
+        {
+            throw new \InvalidArgumentException('Argument must be of equal size');
+        }
+    }
+
+    /**
+     * And with an another bit array
+     *
+     * @param   BitArray  $bits  A bit array
+     *
+     * @return  BitArray  This object for chaining
+     *
+     * @throw   \InvalidArgumentException  Argument must be of equal size
+     *
+     * @since   1.0.0
+     */
+    public function applyAnd(BitArray $bits)
+    {
+        if ($this->size == $bits->size)
+        {
+            $length = strlen($this->data);
+
+            for ($index = 0; $index < $length; $index++)
+            {
+                $this->data[$index] = chr(ord($this->data[$index]) & ord($bits->data[$index]));
+            }
+
+            return $this;
+        }
+        else
+        {
+            throw new \InvalidArgumentException('Argument must be of equal size');
+        }
+    }
+
+    /**
+     * Xor with an another bit array
+     *
+     * @param   BitArray  $bits  A bit array
+     *
+     * @return  BitArray  This object for chaining
+     *
+     * @throw   \InvalidArgumentException  Argument must be of equal size
+     *
+     * @since   1.0.0
+     */
+    public function applyXor(BitArray $bits)
+    {
+        if ($this->size == $bits->size)
+        {
+            $length = strlen($this->data);
+
+            for ($index = 0; $index < $length; $index++)
+            {
+                $this->data[$index] = chr(ord($this->data[$index]) ^ ord($bits->data[$index]));
+            }
+
+            return $this;
+        }
+        else
+        {
+            throw new \InvalidArgumentException('Argument must be of equal size');
+        }
+    }
+
+
+    /**
+     * And with an another bit array
+     *
+     * @param   BitArray  $bits  A bit array
+     *
+     * @return  BitArray  This object for chaining
+     *
+     * @throw   \InvalidArgumentException  Argument must be of equal size
+     *
+     * @since   1.0.0
+     */
+    public function andWith(BitArray $bits, $offset)
+    {
+        if ( $offset < 0  || $offset >= $this->size ) {
+            throw new \InvalidArgumentException('Invalid offset');
+        }
+
+        if ( $offset  + $bits->size() > $this->size ) {
+            throw new \InvalidArgumentException('Invalid offset');
+        }
+
+        $resultBits = BitArray::fromSlice($bits);
+        $temp = BitArray::fromSlice($this, $offset, $bits->size());
+
+        $length = strlen($bits->data);
+
+        for ($index = 0; $index < $length; $index++)
+        {
+            $resultBits->data[$index] = chr( ord($temp->data[$index]) & ord($bits->data[$index]));
+        }
+
+        return $resultBits;
+    }
+
+
+    /**
+     * Author Brigitte Bedard. Inspired by applyOr
+     *
+     * Bitwise OR with the BitArray object parameter, starting the operation at 'offset' from the
+     * start of the calling Object and returning a new BitArray Object
+     *
 	 * @param   BitArray  $bits  A bit array
 	 *
-	 * @return  BitArray  This object for chaining
+	 * @return  BitArray  A new BitArray instance
 	 *
-	 * @throw   \InvalidArgumentException  Argument must be of equal size
+	 * @throw   \InvalidArgumentException  Invalid offset : If offset + parameter length is greater than the calling object
 	 *
 	 * @since   1.0.0
 	 */
-	public function applyOr(BitArray $bits)
+	public function orWith(BitArray $bits, $offset)
 	{
-		if ($this->size == $bits->size)
-		{
-			$length = strlen($this->data);
+        if ( $offset < 0  || $offset >= $this->size ) {
+            throw new \InvalidArgumentException('Invalid offset');
+        }
 
-			for ($index = 0; $index < $length; $index++)
-			{
-				$this->data[$index] = chr(ord($this->data[$index]) | ord($bits->data[$index]));
-			}
+        if ( $offset  + $bits->size() > $this->size ) {
+            throw new \InvalidArgumentException('Invalid offset');
+        }
 
-			return $this;
-		}
-		else
-		{
-			throw new \InvalidArgumentException('Argument must be of equal size');
-		}
+        $resultBits = BitArray::fromSlice($bits);
+        $temp = BitArray::fromSlice($this, $offset, $bits->size());
+
+        $length = strlen($bits->data);
+
+        for ($index = 0; $index < $length; $index++)
+        {
+            $resultBits->data[$index] = chr( ord($temp->data[$index]) | ord($bits->data[$index]));
+        }
+
+        return $resultBits;
 	}
 
-	/**
-	 * And with an another bit array
-	 *
-	 * @param   BitArray  $bits  A bit array
-	 *
-	 * @return  BitArray  This object for chaining
-	 *
-	 * @throw   \InvalidArgumentException  Argument must be of equal size
-	 *
-	 * @since   1.0.0
-	 */
-	public function applyAnd(BitArray $bits)
+    /**
+     * Author Brigitte Bedard. Inspired by applyAnd
+     *
+     * Bitwise NAND with the BitArray object parameter, starting the operation at 'offset' from the
+     * start of the calling Object and returning a new BitArray Object
+     *
+     * @param   BitArray  $bits  A bit array
+     *
+     * @return  BitArray  A new BitArray instance
+     *
+     * @throw   \InvalidArgumentException  Invalid offset : If offset + parameter length is greater than the calling object
+     *
+     * @since   1.0.0
+     */
+    public function nandWith(BitArray $bits, $offset)
+    {
+        if ( $offset < 0  || $offset >= $this->size ) {
+            throw new \InvalidArgumentException('Invalid offset');
+        }
+
+        if ( $offset  + $bits->size() > $this->size ) {
+            throw new \InvalidArgumentException('Invalid offset');
+        }
+
+        $resultBits = BitArray::fromSlice($bits);
+        $temp = BitArray::fromSlice($this, $offset, $bits->size());
+
+        $length = strlen($bits->data);
+
+        for ($index = 0; $index < $length; $index++)
+        {
+            $resultBits->data[$index] = chr( ~(ord($temp->data[$index]) & ord($bits->data[$index])));
+        }
+
+        return $resultBits;
+    }
+
+    /**
+     * Author Brigitte Bedard. Inspired by applyXor
+     *
+     * Bitwise NAND with the BitArray object parameter, starting the operation at 'offset' from the
+     * start of the calling Object and returning a new BitArray Object
+     *
+     * @param   BitArray  $bits  A bit array
+     *
+     * @return  BitArray  A new BitArray instance
+     *
+     * @throw   \InvalidArgumentException  Invalid offset : If offset + parameter length is greater than the calling object
+     *
+     * @since   1.0.0
+     */
+	public function xorWith(BitArray $bits, $offset)
 	{
-		if ($this->size == $bits->size)
-		{
-			$length = strlen($this->data);
+        if ( $offset < 0  || $offset >= $this->size ) {
+            throw new \InvalidArgumentException('Invalid offset');
+        }
 
-			for ($index = 0; $index < $length; $index++)
-			{
-				$this->data[$index] = chr(ord($this->data[$index]) & ord($bits->data[$index]));
-			}
+        if ( $offset  + $bits->size() > $this->size ) {
+            throw new \InvalidArgumentException('Invalid offset');
+        }
 
-			return $this;
-		}
-		else
-		{
-			throw new \InvalidArgumentException('Argument must be of equal size');
-		}
+        $resultBits = BitArray::fromSlice($bits);
+        $temp = BitArray::fromSlice($this, $offset, $bits->size());
+
+        $length = strlen($bits->data);
+
+        for ($index = 0; $index < $length; $index++)
+        {
+            $resultBits->data[$index] = chr( ord($temp->data[$index]) ^ ord($bits->data[$index]));
+        }
+
+        return $resultBits;
 	}
 
-	/**
-	 * Xor with an another bit array
-	 *
-	 * @param   BitArray  $bits  A bit array
-	 *
-	 * @return  BitArray  This object for chaining
-	 *
-	 * @throw   \InvalidArgumentException  Argument must be of equal size
-	 *
-	 * @since   1.0.0
-	 */
-	public function applyXor(BitArray $bits)
-	{
-		if ($this->size == $bits->size)
-		{
-			$length = strlen($this->data);
-
-			for ($index = 0; $index < $length; $index++)
-			{
-				$this->data[$index] = chr(ord($this->data[$index]) ^ ord($bits->data[$index]));
-			}
-
-			return $this;
-		}
-		else
-		{
-			throw new \InvalidArgumentException('Argument must be of equal size');
-		}
-	}
 
 	/**
 	 * Shift a bit array.
