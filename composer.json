@@ -1,5 +1,5 @@
 {
-	"name": "chdemko/bitarray",
+	"name": "dv/bitarray",
 	"type": "library",
 	"description": "BitArray for PHP >= 5.5",
 	"keywords": ["bits","array","iterator"],
@@ -7,7 +7,7 @@
 	"license": "BSD-3-Clause",
 	"authors": [
 		{
-			"name": "Christophe Demko",
+			"name": "Christophe Demko, Brigitte Bedard",
 			"email": "chdemko@gmail.com",
 			"homepage": "http://chdemko.com",
 			"role": "Developer"
