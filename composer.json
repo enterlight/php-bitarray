@@ -7,8 +7,8 @@
 	"license": "BSD-3-Clause",
 	"authors": [
 		{
-			"name": "Christophe Demko, Brigitte Bedard",
-			"email": "chdemko@gmail.com",
+			"name": "Christophe Demko (original), Brigitte Bedard (forked)",
+			"email": "chdemko@gmail.com brigitte.bedard@gmail.com",
 			"homepage": "http://chdemko.com",
 			"role": "Developer"
 		}
